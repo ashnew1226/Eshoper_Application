@@ -77,3 +77,4 @@ gem 'rails_admin'
 # Authorization
 gem 'cancancan'
 gem "sassc-rails"
+gem 'pry'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_15_110631) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_24_055454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -47,6 +47,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_110631) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "carts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -68,6 +73,52 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_110631) do
     t.date "created_date"
     t.integer "modify_by"
     t.date "modify_date"
+  end
+
+  create_table "order_details", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "quantity"
+    t.decimal "amount"
+    t.bigint "product_id", null: false
+    t.bigint "user_order_id", null: false
+    t.bigint "cart_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["cart_id"], name: "index_order_details_on_cart_id"
+    t.index ["product_id"], name: "index_order_details_on_product_id"
+    t.index ["user_id"], name: "index_order_details_on_user_id"
+    t.index ["user_order_id"], name: "index_order_details_on_user_order_id"
+  end
+
+  create_table "product_attribute_values", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "attribute_value"
+    t.integer "created_by"
+    t.date "created_date"
+    t.integer "modified_by"
+    t.date "modified_date"
+    t.bigint "product_attributes_id", null: false
+    t.index ["product_attributes_id"], name: "index_product_attribute_values_on_product_attributes_id"
+  end
+
+  create_table "product_attributes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "name"
+    t.integer "created_by"
+    t.date "created_date"
+    t.integer "modified_by"
+    t.date "modified_date"
+  end
+
+  create_table "product_attributes_assocs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "product_id", null: false
+    t.bigint "product_attributes_id", null: false
+    t.index ["product_attributes_id"], name: "index_product_attributes_assocs_on_product_attributes_id"
+    t.index ["product_id"], name: "index_product_attributes_assocs_on_product_id"
   end
 
   create_table "product_categories", force: :cascade do |t|
@@ -114,6 +165,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_110631) do
     t.date "modify_date"
   end
 
+  create_table "user_orders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -125,12 +181,27 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_15_110631) do
     t.boolean "superadmin_role", default: false
     t.boolean "supervisor_role", default: false
     t.boolean "user_role", default: true
+    t.string "firstname"
+    t.string "lastname"
+    t.integer "status", default: 0
+    t.date "created_date"
+    t.string "fb_token"
+    t.string "twitter_token"
+    t.string "google_token"
+    t.integer "registration_method", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "order_details", "carts"
+  add_foreign_key "order_details", "products"
+  add_foreign_key "order_details", "user_orders"
+  add_foreign_key "order_details", "users"
+  add_foreign_key "product_attribute_values", "product_attributes", column: "product_attributes_id"
+  add_foreign_key "product_attributes_assocs", "product_attributes", column: "product_attributes_id"
+  add_foreign_key "product_attributes_assocs", "products"
   add_foreign_key "product_categories", "categories"
   add_foreign_key "product_categories", "products"
   add_foreign_key "product_images", "products"

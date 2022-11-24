@@ -13,3 +13,11 @@
  *= require_tree .
  *= require_self
  */
+
+ @import 'css/animate';
+ @import 'css/bootstrap.min';
+ @import 'css/font-awesome.min';
+ @import 'css/main';
+ @import 'css/prettyPhoto';
+ @import 'css/price-range';
+ @import 'css/responsive';
