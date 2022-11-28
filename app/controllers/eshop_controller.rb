@@ -2,8 +2,10 @@ class EshopController < ApplicationController
     skip_before_action :authenticate_user!
    
     def index
-        @products = Product.all rescue nil
-        puts "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#{@products.count}"
+        @banners = BannerManagement.all
+        @category = Category.all
+        @products = Product.all
+
     end
     def login
         
