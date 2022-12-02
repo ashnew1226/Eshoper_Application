@@ -78,3 +78,10 @@ gem 'rails_admin'
 gem 'cancancan'
 gem "sassc-rails"
 gem 'pry'
+gem 'omniauth-facebook'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection'
+gem 'omniauth-github', github: 'omniauth/omniauth-github', branch: 'master'
+# gem 'omniauth-twitter'
+

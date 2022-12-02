@@ -3,15 +3,18 @@ class EshopController < ApplicationController
    
     def index
         @banners = BannerManagement.all
-        @category = Category.all
-        @products = Product.all
+        @products = Product.all.limit(6)
+        @category = Category.where(parent_id: nil)
+        # 593451385883640 fb app id
+        # b3ca5228e9d1b1d2445767ecd5d5db8e
 
     end
     def login
         
     end
     def product_details
-        
+        @category = Category.find(params[:id])
+        @products = @category.products
     end
     def shop
         

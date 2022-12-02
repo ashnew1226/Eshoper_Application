@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_25_101120) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -74,6 +74,16 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_101120) do
     t.date "created_date"
     t.integer "modify_by"
     t.date "modify_date"
+  end
+
+  create_table "coupons", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "modify_date"
+    t.integer "modify_by"
+    t.string "code"
+    t.decimal "percent_off", precision: 15, scale: 6
+    t.integer "number_of_uses"
   end
 
   create_table "order_details", force: :cascade do |t|
@@ -166,9 +176,30 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_101120) do
     t.date "modify_date"
   end
 
+  create_table "user_addresses", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "address1"
+    t.string "address2"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "zipcode"
+  end
+
   create_table "user_orders", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.bigint "user_address_id", null: false
+    t.string "transaction_id"
+    t.integer "status", default: 0
+    t.decimal "grand_total", precision: 15, scale: 13
+    t.decimal "shipping_charges", precision: 15, scale: 13
+    t.bigint "coupon_id", null: false
+    t.index ["coupon_id"], name: "index_user_orders_on_coupon_id"
+    t.index ["user_address_id"], name: "index_user_orders_on_user_address_id"
+    t.index ["user_id"], name: "index_user_orders_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -190,6 +221,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_101120) do
     t.string "twitter_token"
     t.string "google_token"
     t.integer "registration_method", default: 0
+    t.string "provider"
+    t.string "uid"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -206,4 +239,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_25_101120) do
   add_foreign_key "product_categories", "categories"
   add_foreign_key "product_categories", "products"
   add_foreign_key "product_images", "products"
+  add_foreign_key "user_orders", "coupons"
+  add_foreign_key "user_orders", "user_addresses"
+  add_foreign_key "user_orders", "users"
 end
