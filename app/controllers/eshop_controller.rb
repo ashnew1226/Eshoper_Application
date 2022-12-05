@@ -1,13 +1,16 @@
 class EshopController < ApplicationController
     skip_before_action :authenticate_user!
-   
+
+
     def index
         @banners = BannerManagement.all
         @products = Product.all.limit(6)
         @category = Category.where(parent_id: nil)
-        # 593451385883640 fb app id
-        # b3ca5228e9d1b1d2445767ecd5d5db8e
+        
 
+    end
+    def shopping_cart
+        
     end
     def login
         
@@ -37,5 +40,18 @@ class EshopController < ApplicationController
     end
     def error404
         
+    end
+
+       
+    def add_to_cart
+        id = params[:id].to_i
+        session[:cart] << id unless session[:cart].include?(id)
+        redirect_to root_path
+    end
+    
+    def remove_from_cart
+        id = params[:id].to_i
+        session[:cart].delete(id)
+        redirect_to root_path
     end
 end
