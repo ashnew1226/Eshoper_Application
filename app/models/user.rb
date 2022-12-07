@@ -5,7 +5,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, :omniauth_providers=> [:google_oauth2, :facebook, :github]
     
-
+  has_many :coupons_useds
+  has_many :coupons, through: :coupons_useds
   def self.from_omniauth(auth)
 
     where(provider: auth.provider, uid: auth.uid).first_or_create do |user|

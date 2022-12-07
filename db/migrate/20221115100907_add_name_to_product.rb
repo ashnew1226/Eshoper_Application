@@ -8,7 +8,7 @@ class AddNameToProduct < ActiveRecord::Migration[7.0]
     add_column :products, :special_price, :decimal, precision: 14, scale: 2 
     add_column :products, :special_price_from, :date
     add_column :products, :special_price_to, :date
-    add_column :products, :quantity, :integer   
+    add_column :products, :quantity, :integer, default: 1
     add_column :products, :meta_title, :string   
     add_column :products, :meta_description, :text   
     add_column :products, :meta_keywords, :text   

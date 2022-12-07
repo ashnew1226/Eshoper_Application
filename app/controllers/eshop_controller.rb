@@ -1,6 +1,6 @@
 class EshopController < ApplicationController
     skip_before_action :authenticate_user!
-
+    # after_filter :increase_quantity
 
     def index
         @banners = BannerManagement.all
@@ -30,7 +30,44 @@ class EshopController < ApplicationController
         
     end
     def cart
+        @sum = 0
+       @item = @cart.each do |item|
+            @sum += item.price
+       end
+       @shipping_charge = 25
+       @max_shipping_charge = 500
+       @user = current_user
+       @used_coupon = params[:code]
+    #    cp = Coupon.find(5)
+       cp = Coupon.find_by(code: @used_coupon)
+    #    cp = Coupon.where(code: @used_coupon)
+    @coupons = Coupon.all
+    # coupons = []
+    number_of_uses = 0
+    @coupons.each do |c|
+        # coupons << c.code
+        # coupons.each do |ele|
+        if @used_coupon == c.code
+            # binding.pry
+            if @user.coupons.include?(cp)
+                puts "*****coupn already used************************"
+            else
+                        @percent_off = c.percent_off
+                        @total = @sum - @percent_off
+                       
+                        puts "valid coupon applied"
+                        use = c.number_of_uses += 1
+                        @user.coupons << c
+                        
+                    end
+                    
+                else
+                    puts "invalid"
+                end
+        end
         
+
+      
     end
     def checkout
         
@@ -45,7 +82,9 @@ class EshopController < ApplicationController
        
     def add_to_cart
         id = params[:id].to_i
-        session[:cart] << id unless session[:cart].include?(id)
+        a = session[:cart] << id unless session[:cart].include?(id)
+        # binding.pry   @product_price_lists = [] 
+       
         redirect_to root_path
     end
     
@@ -53,5 +92,29 @@ class EshopController < ApplicationController
         id = params[:id].to_i
         session[:cart].delete(id)
         redirect_to root_path
+    end
+    def remove_from_cart1
+        id = params[:id].to_i
+        session[:cart].delete(id)
+        redirect_to eshop_cart_path
+    end
+
+   
+    def decrease_quantity
+        @product_item = Product.find(params[:id])
+        @product_item.quantity -= 1
+        @product_item.save
+    end
+
+    private
+
+    def increase_quantity
+        @product_item = Product.find(params[:id])
+        session[:quantity] = 0
+        @quantity = session[:quantity]
+        @quantity += 1
+
+    
+        
     end
 end

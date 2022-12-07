@@ -2528,3 +2528,6 @@ h2.title {
 .imgsize {
   height: 108px;
 }
+.flexclass{
+  display:flex;
+}

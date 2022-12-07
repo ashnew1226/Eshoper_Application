@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
+ActiveRecord::Schema[7.0].define(version: 2022_12_06_143615) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,6 +84,16 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
     t.string "code"
     t.decimal "percent_off", precision: 15, scale: 6
     t.integer "number_of_uses"
+    t.boolean "status"
+  end
+
+  create_table "coupons_useds", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "coupon_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["coupon_id"], name: "index_coupons_useds_on_coupon_id"
+    t.index ["user_id"], name: "index_coupons_useds_on_user_id"
   end
 
   create_table "order_details", force: :cascade do |t|
@@ -94,10 +104,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
     t.bigint "product_id", null: false
     t.bigint "user_order_id", null: false
     t.bigint "cart_id", null: false
-    t.bigint "user_id", null: false
     t.index ["cart_id"], name: "index_order_details_on_cart_id"
     t.index ["product_id"], name: "index_order_details_on_product_id"
-    t.index ["user_id"], name: "index_order_details_on_user_id"
     t.index ["user_order_id"], name: "index_order_details_on_user_order_id"
   end
 
@@ -165,7 +173,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
     t.decimal "special_price", precision: 14, scale: 2
     t.date "special_price_from"
     t.date "special_price_to"
-    t.integer "quantity"
+    t.integer "quantity", default: 1
     t.string "meta_title"
     t.text "meta_description"
     t.text "meta_keywords"
@@ -179,8 +187,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
   create_table "user_addresses", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "address1"
-    t.string "address2"
+    t.string "billing_address"
+    t.string "shipping_address"
     t.string "city"
     t.string "state"
     t.string "country"
@@ -191,14 +199,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.bigint "user_address_id", null: false
-    t.string "transaction_id"
-    t.integer "status", default: 0
-    t.decimal "grand_total", precision: 15, scale: 13
-    t.decimal "shipping_charges", precision: 15, scale: 13
     t.bigint "coupon_id", null: false
     t.index ["coupon_id"], name: "index_user_orders_on_coupon_id"
-    t.index ["user_address_id"], name: "index_user_orders_on_user_address_id"
     t.index ["user_id"], name: "index_user_orders_on_user_id"
   end
 
@@ -229,10 +231,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "coupons_useds", "coupons"
+  add_foreign_key "coupons_useds", "users"
   add_foreign_key "order_details", "carts"
   add_foreign_key "order_details", "products"
   add_foreign_key "order_details", "user_orders"
-  add_foreign_key "order_details", "users"
   add_foreign_key "product_attribute_values", "product_attributes", column: "product_attributes_id"
   add_foreign_key "product_attributes_assocs", "product_attributes", column: "product_attributes_id"
   add_foreign_key "product_attributes_assocs", "products"
@@ -240,6 +243,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_12_01_062239) do
   add_foreign_key "product_categories", "products"
   add_foreign_key "product_images", "products"
   add_foreign_key "user_orders", "coupons"
-  add_foreign_key "user_orders", "user_addresses"
   add_foreign_key "user_orders", "users"
 end

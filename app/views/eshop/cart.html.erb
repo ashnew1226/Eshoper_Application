@@ -21,6 +21,7 @@
 					</thead>
 					<tbody>
 						<% @cart.each do |product| %>
+						
 						<tr>
 							<td class="cart_product">
 								<a href=""><%= image_tag product.ProductImage,class: "imgsize" %></a>
@@ -33,17 +34,20 @@
 								<p><%= product.price %></p>
 							</td>
 							<td class="cart_quantity">
-								<div class="cart_quantity_button">
-									<a class="cart_quantity_up" href=""> + </a>
-									<input class="cart_quantity_input" type="text" name="quantity" value="1" autocomplete="off" size="2">
-									<a class="cart_quantity_down" href=""> - </a>
+								<div class="cart_quantity_button flexclass">
+								<%= button_to '+', increase_quantity_path(product), method: :patch, remote: true, class:"cart_quantity_up"  %>
+
+									<input class="cart_quantity_input" type="text" name="quantity" value="<%= @quantity %>" autocomplete="off" size="2">
+								<%= button_to '-', decrease_quantity_path(product), method: :patch, remote: false, class:"cart_quantity_down"  %>
 								</div>
 							</td>
 							<td class="cart_total">
-								<p class="cart_total_price">$59</p>
+								<p class="cart_total_price"><%= product.price %></p>
 							</td>
 							<td class="cart_delete">
-								<a class="cart_quantity_delete" href=""><i class="fa fa-times"></i></a>
+								<%= link_to remove_from_cart1_path(product),data: {:remote => true, turbo_method: :delete}, class:"cart_quantity_delete" do %>
+									<i class="fa fa-times"></i>
+								<% end %>
 							</td>
 						</tr>
 							<% end %>
@@ -64,20 +68,24 @@
 			<div class="row">
 				<div class="col-sm-6">
 					<div class="chose_area">
+
+					<%= form_with model: @coupon, url: coupons_path,  local: true,data: { turbo: false } do |form| %>
 						<ul class="user_option">
 							<li>
-								<input type="checkbox">
-								<label>Use Coupon Code</label>
+							<div class="mb-3">
+								<%= form.label :coupon_code %>
+								<%= form.text_field :code, class: "form-control" , placeholder: "enter coupon code" %>
+							</div>
+								
 							</li>
+							
 							<li>
-								<input type="checkbox">
-								<label>Use Gift Voucher</label>
-							</li>
-							<li>
-								<input type="checkbox">
-								<label>Estimate Shipping & Taxes</label>
+								<div class="mb-3">
+									<%= form.submit "Apply", class: "btn btn-primary" %>
+								</div>
 							</li>
 						</ul>
+						<% end %>
 						<ul class="user_info">
 							<li class="single_field">
 								<label>Country:</label>
@@ -119,10 +127,28 @@
 				<div class="col-sm-6">
 					<div class="total_area">
 						<ul>
-							<li>Cart Sub Total <span>$59</span></li>
+							<li>Cart Sub Total <span><%= @sum %></span></li>
 							<li>Eco Tax <span>$2</span></li>
-							<li>Shipping Cost <span>Free</span></li>
-							<li>Total <span>$61</span></li>
+							<li>Coupon Off <span><%= @percent_off %></span></li>
+
+							<% if @total.present? && @sum > @max_shipping_charge %>
+								<li>Shipping Cost <span>Free</span></li>
+
+							<% elsif @sum.present? && @sum > @max_shipping_charge  %>
+								<li>Total <span><%= @shipping_charge = 0  %></span></li>
+
+							<% else %>
+								<li>Shipping Cost <span><%= @shipping_charge %></span></li>
+							<% end %>
+							<% if @total.present? && @total > @max_shipping_charge  %>
+								<li>Total <span><%= @total  %></span></li>
+							
+							<% elsif @sum.present? && @sum < @max_shipping_charge  %>
+							<li>Shipping Cost <span><%= @total_sum = @sum + @shipping_charge %></span></li>
+
+							<% else	 %>
+								<li>Total <span><%= @sum %></span></li>
+							<% end %>
 						</ul>
 							<a class="btn btn-default update" href="">Update</a>
 							<a class="btn btn-default check_out" href="">Check Out</a>
